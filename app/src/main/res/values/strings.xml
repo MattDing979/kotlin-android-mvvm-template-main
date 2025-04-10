@@ -1,0 +1,24 @@
+<resources>
+    // TODO: Set App Name
+    <string name="app_name">Kotlin Android Template</string>
+    <string name="opening_price">開盤價</string>
+    <string name="closing_price">收盤價</string>
+    <string name="highest_price">最高價</string>
+    <string name="lowest_price">最低價</string>
+    <string name="spread">漲跌價差</string>
+    <string name="average_monthly_price">月平均價</string>
+    <string name="number_of_transactions">成交筆數</string>
+    <string name="number_of_shares_traded">成交股數</string>
+    <string name="transaction_amount">成交金額</string>
+    <string name="sort_in_descending_order">依股票代號降序</string>
+    <string name="sort_in_ascending_order">依股票代號升序</string>
+    <string name="confirm">確認</string>
+    <string name="dialog_message">
+        \n本益比： %1$s
+        \n殖息率： %2$s
+        \n股價淨值比： %3$s
+    </string>
+    <string name="price_earnings_ratio">本益比</string>
+    <string name="dividend_yield">殖息率</string>
+    <string name="price_book_ratio">股價淨值比</string>
+</resources>
