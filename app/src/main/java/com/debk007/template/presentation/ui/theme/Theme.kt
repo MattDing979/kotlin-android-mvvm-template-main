@@ -29,7 +29,7 @@ private val LightColorScheme = lightColorScheme(
 
 // TODO: Set Theme Name
 @Composable
-fun KotlinAndroidTemplateTheme(
+fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

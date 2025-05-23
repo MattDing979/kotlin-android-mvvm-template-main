@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BwibbuData(
+    @SerialName("Date")
+    val date: String,
     @SerialName("Code")
     val code: String,
     @SerialName("Name")

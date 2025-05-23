@@ -1,4 +1,4 @@
-package com.debk007.template.presentation.viewmodel
+package com.debk007.template.presentation.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,8 +6,6 @@ import com.debk007.template.model.BwibbuData
 import com.debk007.template.model.StockDayAllData
 import com.debk007.template.presentation.item.DailyStockItem
 import com.debk007.template.repository.Repository
-import com.debk007.template.util.ApiState
-import com.debk007.template.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,51 +24,40 @@ class HomeViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val _dailyStockItemsState: MutableStateFlow<UiState<List<DailyStockItem>>> =
-        MutableStateFlow(UiState.Loading(false))
-    val dailyStockItemsState = _dailyStockItemsState.asStateFlow()
+    private val TAG = HomeViewModel::class.java.simpleName
+
+    private val _uiState = MutableStateFlow(HomeScreenState())
+    val uiState = _uiState.asStateFlow()
 
     private val bwibbuFlow = flow {
 
-        when (val result = repository.getBwibbuAll()) {
-            is ApiState.Success -> emit(result.data)
-
-            is ApiState.Error -> {
+        repository.getBwibbuAll()
+            .onSuccess { emit(it) }
+            .onFailure {
                 emit(null)
-
-                _dailyStockItemsState.update { UiState.Error(result.errorMsg) }
             }
-        }
     }.filterNotNull()
 
     private val dailyAvgStockFlow = flow {
 
-        when (val result = repository.getStockDayAvgAll()) {
-            is ApiState.Success -> emit(result.data)
-
-            is ApiState.Error -> {
+        repository.getStockDayAvgAll()
+            .onSuccess { emit(it) }
+            .onFailure {
                 emit(null)
-
-                _dailyStockItemsState.update { UiState.Error(result.errorMsg) }
             }
-        }
     }.filterNotNull()
 
     private val dailyStockFlow = flow {
 
-        when (val result = repository.getStockDayAll()) {
-            is ApiState.Success -> emit(result.data)
-
-            is ApiState.Error -> {
+        repository.getStockDayAll()
+            .onSuccess { emit(it) }
+            .onFailure {
                 emit(null)
-
-                _dailyStockItemsState.update { UiState.Error(result.errorMsg) }
             }
-        }
     }.filterNotNull()
 
     init {
-        _dailyStockItemsState.update { UiState.Loading(true) }
+        _uiState.update { HomeScreenState(isLoading = true) }
         combine(
             bwibbuFlow,
             dailyAvgStockFlow,
@@ -107,26 +94,23 @@ class HomeViewModel @Inject constructor(
                 }
                 .sortedByDescending { it.code }
 
-            _dailyStockItemsState.value = UiState.Success(dailyStockItems)
+            _uiState.value = HomeScreenState(dailyStockItems = dailyStockItems)
         }
             .flowOn(Dispatchers.IO)
             .launchIn(viewModelScope)
     }
 
     fun setSortStatus(sortStatus: SortType) = viewModelScope.launch(Dispatchers.IO) {
+        val items = _uiState.value.dailyStockItems
 
-        if (_dailyStockItemsState.value is UiState.Success) {
-            val items = (_dailyStockItemsState.value as UiState.Success<List<DailyStockItem>>).data
+        _uiState.update {
+            val list = when (sortStatus) {
+                SortType.Descending -> items.sortedByDescending { it.code }
 
-            _dailyStockItemsState.update {
-                val list = when (sortStatus) {
-                    SortType.Descending -> items.sortedByDescending { it.code }
-
-                    SortType.Ascending -> items.sortedBy { it.code }
-                }
-
-                UiState.Success(list)
+                SortType.Ascending -> items.sortedBy { it.code }
             }
+
+            HomeScreenState(dailyStockItems = list)
         }
     }
 
