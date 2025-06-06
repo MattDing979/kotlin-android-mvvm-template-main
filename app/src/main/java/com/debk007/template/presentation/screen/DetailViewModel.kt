@@ -10,5 +10,4 @@ class DetailViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
     private val TAG = DetailViewModel::class.java.simpleName
-
 }
